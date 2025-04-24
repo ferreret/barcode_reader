@@ -12,6 +12,7 @@ FastAPI-powered REST API for barcode decoding from images and PDF documents.
 - 📍 Barcode location coordinates
 - 🛡️ Error handling with detailed responses
 - 🐳 Docker container ready
+- 🖥️ Command-line interface for file decoding
 
 ## 🔌 API Reference
 
@@ -72,7 +73,21 @@ sudo apt-get install poppler-utils
 uvicorn main:app --reload --port 8000
 ```
 
-## 🐳 Docker Usage
+## �️ Command-Line Usage
+
+You can also use the `barcode_decoder.py` script directly from the command line to decode barcodes from a file path.
+
+```bash
+python barcode_decoder.py <filepath>
+```
+
+Example:
+
+```bash
+python barcode_decoder.py path/to/your/document.pdf
+```
+
+## �🐳 Docker Usage
 
 ```bash
 # Build and run
@@ -105,6 +120,8 @@ black main.py
 # Linting
 flake8 main.py
 ```
+
+Unit tests for the API endpoints and decoding logic are located in `test_main.py`.
 
 ## 📄 License
 MIT License - See [LICENSE](LICENSE) for details

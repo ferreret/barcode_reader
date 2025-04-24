@@ -1,9 +1,7 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
-from pdf2image import convert_from_bytes
-from pyzbar.pyzbar import decode
-from PIL import Image
 import io
+from barcode_decoder import decode_from_bytes # Importar la nueva función
 
 app = FastAPI()
 
@@ -19,48 +17,22 @@ async def decode_barcodes(file: UploadFile = File(...)):
 
     try:
         file_bytes = await file.read()
-        results = []
+        
+        # Usar la función del módulo separado para decodificar
+        results = decode_from_bytes(file_bytes, content_type)
 
-        if content_type == "application/pdf":
-            images = convert_from_bytes(file_bytes)
-            for page_num, image in enumerate(images, 1):
-                decoded = decode(image)
-                for barcode in decoded:
-                    results.append(
-                        {
-                            "pagina": page_num,
-                            "tipo": barcode.type,
-                            "datos": barcode.data.decode("utf-8"),
-                            "ubicacion": {
-                                "izquierda": barcode.rect.left,
-                                "superior": barcode.rect.top,
-                                "ancho": barcode.rect.width,
-                                "alto": barcode.rect.height,
-                            },
-                        }
-                    )
-        else:
-            image = Image.open(io.BytesIO(file_bytes))
-            decoded = decode(image)
-            for barcode in decoded:
-                results.append(
-                    {
-                        "pagina": 1,
-                        "tipo": barcode.type,
-                        "datos": barcode.data.decode("utf-8"),
-                        "ubicacion": {
-                            "izquierda": barcode.rect.left,
-                            "superior": barcode.rect.top,
-                            "ancho": barcode.rect.width,
-                            "alto": barcode.rect.height,
-                        },
-                    }
-                )
+        # Determinar el número de páginas para la respuesta JSON
+        # Esto requiere una pequeña modificación ya que decode_from_bytes no devuelve 'images'
+        # Si es PDF, asumimos que cada resultado con página > 1 proviene de una página diferente
+        num_pages = 1
+        if content_type == "application/pdf" and results:
+             num_pages = max([res.get("pagina", 1) for res in results])
+
 
         return JSONResponse(
             content={
                 "archivo": file.filename,
-                "paginas": len(images) if content_type == "application/pdf" else 1,
+                "paginas": num_pages,
                 "codigos_encontrados": len(results),
                 "resultados": results,
             }
