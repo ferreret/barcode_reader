@@ -27,14 +27,14 @@ def decode_from_bytes(file_bytes: bytes, content_type: str) -> list:
             for barcode in decoded:
                 results.append(
                     {
-                        "pagina": page_num,
-                        "tipo": barcode.type,
-                        "datos": barcode.data.decode("utf-8"),
-                        "ubicacion": {
-                            "izquierda": barcode.rect.left,
-                            "superior": barcode.rect.top,
-                            "ancho": barcode.rect.width,
-                            "alto": barcode.rect.height,
+                        "page": page_num,
+                        "type": barcode.type,
+                        "data": barcode.data.decode("utf-8"),
+                        "location": {
+                            "left": barcode.rect.left,
+                            "top": barcode.rect.top,
+                            "width": barcode.rect.width,
+                            "height": barcode.rect.height,
                         },
                     }
                 )
@@ -44,14 +44,14 @@ def decode_from_bytes(file_bytes: bytes, content_type: str) -> list:
         for barcode in decoded:
             results.append(
                 {
-                    "pagina": 1,
-                    "tipo": barcode.type,
-                    "datos": barcode.data.decode("utf-8"),
-                    "ubicacion": {
-                        "izquierda": barcode.rect.left,
-                        "superior": barcode.rect.top,
-                        "ancho": barcode.rect.width,
-                        "alto": barcode.rect.height,
+                    "page": 1,
+                    "type": barcode.type,
+                    "data": barcode.data.decode("utf-8"),
+                    "location": {
+                        "left": barcode.rect.left,
+                        "top": barcode.rect.top,
+                        "width": barcode.rect.width,
+                        "height": barcode.rect.height,
                     },
                 }
             )
@@ -77,15 +77,15 @@ def decode_from_filepath(filepath: str) -> list:
             content_type = "image/unknown"
         return decode_from_bytes(file_bytes, content_type)
     except FileNotFoundError:
-        print(f"Error: Archivo no encontrado en {filepath}", file=sys.stderr)
+        print(f"Error: File not found at {filepath}", file=sys.stderr)
         sys.exit(1)
     except Exception as e:
-        print(f"Error al procesar el archivo {filepath}: {e}", file=sys.stderr)
+        print(f"Error processing file {filepath}: {e}", file=sys.stderr)
         sys.exit(1)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Decodifica códigos de barras de un archivo.")
-    parser.add_argument("filepath", help="Ruta al archivo de imagen o PDF.")
+    parser = argparse.ArgumentParser(description="Decodes barcodes from a file.")
+    parser.add_argument("filepath", help="Path to the image or PDF file.")
     args = parser.parse_args()
 
     results = decode_from_filepath(args.filepath)

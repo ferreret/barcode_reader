@@ -15,15 +15,15 @@ def test_decode_image_success():
     
     # Simular la función decode_from_bytes para que devuelva un resultado conocido
     with patch("main.decode_from_bytes") as mock_decode:
-        mock_decode.return_value = [{"tipo": "QRCODE", "datos": "testdata", "pagina": 1, "ubicacion": {"izquierda": 1, "superior": 1, "ancho": 10, "alto": 10}}]
+        mock_decode.return_value = [{"type": "QRCODE", "data": "testdata", "page": 1, "location": {"left": 1, "top": 1, "width": 10, "height": 10}}]
         response = client.post("/decode/", files=files)
 
     assert response.status_code == 200
     assert response.json() == {
-        "archivo": "test_image.png",
-        "paginas": 1,
-        "codigos_encontrados": 1,
-        "resultados": [{"tipo": "QRCODE", "datos": "testdata", "pagina": 1, "ubicacion": {"izquierda": 1, "superior": 1, "ancho": 10, "alto": 10}}],
+        "file": "test_image.png",
+        "pages": 1,
+        "barcodes_found": 1,
+        "results": [{"type": "QRCODE", "data": "testdata", "page": 1, "location": {"left": 1, "top": 1, "width": 10, "height": 10}}],
     }
 
 def test_decode_pdf_success():
@@ -34,19 +34,19 @@ def test_decode_pdf_success():
     # Simular la función decode_from_bytes para que devuelva resultados de múltiples páginas
     with patch("main.decode_from_bytes") as mock_decode:
         mock_decode.return_value = [
-            {"tipo": "QRCODE", "datos": "data1", "pagina": 1, "ubicacion": {"izquierda": 1, "superior": 1, "ancho": 10, "alto": 10}},
-            {"tipo": "CODE128", "datos": "data2", "pagina": 2, "ubicacion": {"izquierda": 5, "superior": 5, "ancho": 20, "alto": 20}},
+            {"type": "QRCODE", "data": "data1", "page": 1, "location": {"left": 1, "top": 1, "width": 10, "height": 10}},
+            {"type": "CODE128", "data": "data2", "page": 2, "location": {"left": 5, "top": 5, "width": 20, "height": 20}},
         ]
         response = client.post("/decode/", files=files)
 
     assert response.status_code == 200
     assert response.json() == {
-        "archivo": "test_pdf.pdf",
-        "paginas": 2,
-        "codigos_encontrados": 2,
-        "resultados": [
-            {"tipo": "QRCODE", "datos": "data1", "pagina": 1, "ubicacion": {"izquierda": 1, "superior": 1, "ancho": 10, "alto": 10}},
-            {"tipo": "CODE128", "datos": "data2", "pagina": 2, "ubicacion": {"izquierda": 5, "superior": 5, "ancho": 20, "alto": 20}},
+        "file": "test_pdf.pdf",
+        "pages": 2,
+        "barcodes_found": 2,
+        "results": [
+            {"type": "QRCODE", "data": "data1", "page": 1, "location": {"left": 1, "top": 1, "width": 10, "height": 10}},
+            {"type": "CODE128", "data": "data2", "page": 2, "location": {"left": 5, "top": 5, "width": 20, "height": 20}},
         ],
     }
 
@@ -58,7 +58,7 @@ def test_decode_unsupported_file_type():
     response = client.post("/decode/", files=files)
 
     assert response.status_code == 415
-    assert response.json() == {"detail": "Formato no soportado. Use: PNG, JPG, PDF"}
+    assert response.json() == {"detail": "Unsupported format. Use: PNG, JPG, PDF"}
 
 def test_decode_internal_error():
     # Crear un archivo de imagen simulado
@@ -71,7 +71,7 @@ def test_decode_internal_error():
         response = client.post("/decode/", files=files)
 
     assert response.status_code == 500
-    assert "Error procesando archivo:" in response.json()["detail"]
+    assert "Error processing file:" in response.json()["detail"]
 
 # Pruebas unitarias para la función decode_from_bytes en barcode_decoder.py
 # Nota: Para pruebas más completas de decode_from_bytes, necesitarías
@@ -114,9 +114,9 @@ def test_decode_from_bytes_pdf_with_barcodes():
         results = decode_from_bytes(file_content, "application/pdf")
         
         assert len(results) == 2
-        assert results[0]["pagina"] == 1
-        assert results[0]["tipo"] == "QRCODE"
-        assert results[0]["datos"] == "data1"
-        assert results[1]["pagina"] == 2
-        assert results[1]["tipo"] == "CODE128"
-        assert results[1]["datos"] == "data2"
+        assert results[0]["page"] == 1
+        assert results[0]["type"] == "QRCODE"
+        assert results[0]["data"] == "data1"
+        assert results[1]["page"] == 2
+        assert results[1]["type"] == "CODE128"
+        assert results[1]["data"] == "data2"

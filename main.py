@@ -12,7 +12,7 @@ async def decode_barcodes(file: UploadFile = File(...)):
     content_type = file.content_type
     if not content_type.startswith("image/") and content_type != "application/pdf":
         raise HTTPException(
-            status_code=415, detail="Formato no soportado. Use: PNG, JPG, PDF"
+            status_code=415, detail="Unsupported format. Use: PNG, JPG, PDF"
         )
 
     try:
@@ -26,21 +26,21 @@ async def decode_barcodes(file: UploadFile = File(...)):
         # Si es PDF, asumimos que cada resultado con página > 1 proviene de una página diferente
         num_pages = 1
         if content_type == "application/pdf" and results:
-             num_pages = max([res.get("pagina", 1) for res in results])
+             num_pages = max([res.get("page", 1) for res in results])
 
 
         return JSONResponse(
             content={
-                "archivo": file.filename,
-                "paginas": num_pages,
-                "codigos_encontrados": len(results),
-                "resultados": results,
+                "file": file.filename,
+                "pages": num_pages,
+                "barcodes_found": len(results),
+                "results": results,
             }
         )
 
     except Exception as e:
         raise HTTPException(
-            status_code=500, detail=f"Error procesando archivo: {str(e)}"
+            status_code=500, detail=f"Error processing file: {str(e)}"
         )
 
 

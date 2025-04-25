@@ -4,7 +4,7 @@
 ![Python](https://img.shields.io/badge/python-3.10+-blue.svg)
 ![Docker](https://img.shields.io/badge/docker-%20✓-blue)
 
-FastAPI-powered REST API for barcode decoding from images and PDF documents.
+FastAPI-powered REST API for barcode decoding from images and PDF documents. The core decoding logic has been refactored into a separate module (`barcode_decoder.py`) for better organization and reusability.
 
 ## 🚀 Features
 - ✅ PDF document processing (multi-page support)
@@ -30,19 +30,19 @@ async def decode_barcodes(file: UploadFile = File(...))
 #### Success Response
 ```json
 {
-  "archivo": "document.pdf",
-  "paginas": 3,
-  "codigos_encontrados": 5,
-  "resultados": [
+  "file": "document.pdf",
+  "pages": 3,
+  "barcodes_found": 5,
+  "results": [
     {
-      "pagina": 1,
-      "tipo": "CODE128",
-      "datos": "ABC-123",
-      "ubicacion": {
-        "izquierda": 145,
-        "superior": 890,
-        "ancho": 300,
-        "alto": 75
+      "page": 1,
+      "type": "CODE128",
+      "data": "ABC-123",
+      "location": {
+        "left": 145,
+        "top": 890,
+        "width": 300,
+        "height": 75
       }
     }
   ]
@@ -73,9 +73,9 @@ sudo apt-get install poppler-utils
 uvicorn main:app --reload --port 8000
 ```
 
-## �️ Command-Line Usage
+## 🖥️ Command-Line Usage
 
-You can also use the `barcode_decoder.py` script directly from the command line to decode barcodes from a file path.
+You can use the `barcode_decoder.py` script directly from the command line to decode barcodes from a file path.
 
 ```bash
 python barcode_decoder.py <filepath>
@@ -87,7 +87,7 @@ Example:
 python barcode_decoder.py path/to/your/document.pdf
 ```
 
-## �🐳 Docker Usage
+## 🐳 Docker Usage
 
 ```bash
 # Build and run
@@ -121,7 +121,7 @@ black main.py
 flake8 main.py
 ```
 
-Unit tests for the API endpoints and decoding logic are located in `test_main.py`.
+Unit tests for the API endpoints and decoding logic are located in `test_main.py`. Unit tests for the core decoding logic in `barcode_decoder.py` have also been added.
 
 ## 📄 License
 MIT License - See [LICENSE](LICENSE) for details
